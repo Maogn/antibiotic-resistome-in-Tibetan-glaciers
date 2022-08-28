@@ -1,0 +1,116 @@
+library("tidyr")
+library("ggplot2")
+library(car)
+library(ggpubr)
+
+library(purrr)
+mine.data.flu <- read.csv(file = "Acinetobacter.csv")
+str(mine.data.flu)
+mine.long.flu <- pivot_longer(data = mine.data.flu,
+                          cols = -c(1:4),
+                          names_to = "Class",
+                          values_to = "Abundance")
+mine.long.flu <- within(mine.long.flu, Depth <- factor(Depth, levels = c("Snow", "Ice", "Cryoconite")))
+with(mine.long.flu, levels(Depth))
+Acinetobacter<-ggplot(mine.long.flu,aes(x =  Class, y = Abundance, fill = Site)) +
+  geom_boxplot(alpha=0.9) +
+  scale_y_continuous(name = "Relative abundance")+
+  scale_x_discrete(name = "") +
+  facet_wrap(~Depth, scales = 'free_x', ncol = 3)+
+  stat_summary(mapping=aes(group=Site),                   
+  fun="mean",                                   
+  geom="point",shape=21,size=2,fill="white",    
+  position=position_dodge(0.75))+
+  
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face =  "bold",family = "serif"),
+        panel.grid = element_blank(), 
+        strip.text = element_text(size = 12,family = "serif"),
+        text = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 13,face="bold",family = "serif"),
+        axis.text.x=element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 12,family = "serif"),
+        panel.grid.minor=element_blank())
+Acinetobacter
+p1<-Acinetobacter +　stat_compare_means(method = "wilcox.test", method.args = list(var.equal = TRUE))
+p1
+
+
+mine.data.flu1 <- read.csv(file = "Pseudomonas-1.csv")
+str(mine.data.flu1)
+mine.long.flu1 <- pivot_longer(data = mine.data.flu1,
+                              cols = -c(1:4),
+                              names_to = "Class",
+                              values_to = "Abundance")
+mine.long.flu1 <- within(mine.long.flu1, Depth <- factor(Depth, levels = c("Snow", "Ice", "Cryoconite")))
+with(mine.long.flu1, levels(Depth))
+Pseudomonas<-ggplot(mine.long.flu1,aes(x =  Class, y = Abundance, fill = Site)) +
+  geom_boxplot(alpha=0.9) +
+  scale_y_continuous(name = "Relative abundance")+
+  scale_x_discrete(name = "") +
+  facet_wrap(~Depth, scales = 'free_x', ncol = 3)+
+  stat_summary(mapping=aes(group=Site),                   
+               fun="mean",                                   
+               geom="point",shape=21,size=2,fill="white",    
+               position=position_dodge(0.75))+
+  
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face =  "bold",family = "serif"),
+        panel.grid = element_blank(), 
+        strip.text = element_text(size = 12,family = "serif"),
+        text = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 13,face="bold",family = "serif"),
+        axis.text.x=element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 12,family = "serif"),
+        panel.grid.minor=element_blank())
+Pseudomonas
+p3<-Pseudomonas +　stat_compare_means(method = "wilcox.test", method.args = list(var.equal = TRUE))
+p3
+
+
+mine.data.flu2 <- read.csv(file = "Staphylococcus.csv")
+str(mine.data.flu2)
+mine.long.flu2 <- pivot_longer(data = mine.data.flu2,
+                               cols = -c(1:4),
+                               names_to = "Class",
+                               values_to = "Abundance")
+mine.long.flu2 <- within(mine.long.flu2, Depth <- factor(Depth, levels = c("Snow", "Ice", "Cryoconite")))
+with(mine.long.flu2, levels(Depth))
+Staphylococcus<-ggplot(mine.long.flu2,aes(x =  Class, y = Abundance, fill = Site)) +
+  geom_boxplot(alpha=0.9) +
+  scale_y_continuous(name = "Relative abundance")+
+  scale_x_discrete(name = "") +
+  facet_wrap(~Depth, scales = 'free_x', ncol = 3)+
+  stat_summary(mapping=aes(group=Site),                   
+               fun="mean",                                   
+               geom="point",shape=21,size=2,fill="white",    
+               position=position_dodge(0.75))+
+  
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face =  "bold",family = "serif"),
+        panel.grid = element_blank(), 
+        strip.text = element_text(size = 12,family = "serif"),
+        text = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 13,face="bold",family = "serif"),
+        axis.text.x=element_blank(),
+        legend.position = "none",
+        legend.text = element_text(size = 12,family = "serif"),
+        panel.grid.minor=element_blank())
+Staphylococcus
+p2<-Staphylococcus +　stat_compare_means(method = "wilcox.test", method.args = list(var.equal = TRUE))
+p2
+
+library(car)
+library(ggpubr)
+library(reshape2)
+library(purrr)
+
+figure <- ggarrange(Acinetobacter,Pseudomonas,Staphylococcus,
+                    ncol = 2, nrow = 2,align = "v")
+
+figure
