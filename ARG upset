@@ -1,0 +1,39 @@
+library(UpSetR)
+library("wesanderson")
+
+ARG<-read.delim('ARGupset.txt',row.names=1,sep = '\t',stringsAsFactors = FALSE,check.names = FALSE)
+ARG[ARG>0]<-1
+
+cbbPalette <- c("#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680",
+                "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4","#CEAB07", "#C27D38",
+                "#9986A5", "#79402E", "#CCBA72", "#0F0D0E",
+                "#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680",
+                "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4","#CEAB07", "#C27D38",
+                "#9986A5", "#79402E",
+                "#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680",
+                "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4","#CEAB07", "#C27D38",
+                "#9986A5", "#79402E",
+                "#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680",
+                "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4","#CEAB07", "#C27D38",
+                "#9986A5", "#79402E"
+                )
+
+
+upset(ARG,nsets = 29,nintersects = 100)
+p<-upset(data = ARG, 
+         nsets = 29, 
+         nintersects = 100,
+      
+      number.angles = 0, 
+      point.size = 3.5,
+      line.size = 1, 
+      mainbar.y.label = "Intersection size", 
+      sets.x.label = "Set size", 
+      mb.ratio = c(0.6, 0.4), 
+      text.scale = c(2,3,4,1.5,1.5,2),
+      main.bar.color=cbbPalette,
+      shade.color=wes_palette("IsleofDogs1",1),
+      sets.bar.color=wes_palette("Moonrise3",1),
+      order.by = "freq"
+      )
+p
