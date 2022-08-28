@@ -1,0 +1,39 @@
+library("tidyr")
+library("ggplot2")
+library(car)
+library(ggpubr)
+
+library(purrr)
+glacier.data.MGE <- read.csv(file = "glacier-data-MGE.csv")
+str(glacier.data.MGE)
+long.glacier.data.MGE <- pivot_longer(data = glacier.data.MGE,
+                          cols = -c(1:4),
+                          names_to = "Class",
+                          values_to = "Abundance")
+long.glacier.data.MGE <- within(long.glacier.data.MGE, Depth <- factor(Depth, levels = c("Snow", "Ice", "Cryoconite")))
+with(long.glacier.data.MGE, levels(Depth))
+p.glacier.data.MGE<-ggplot(long.glacier.data.MGE,aes(x =  Class, y = Abundance, fill = Site)) +
+  geom_boxplot(alpha=0.9) +
+  scale_y_continuous(name = "Relative abundance",limits = c(-1,400000),breaks=c(0,200000,400000))+
+  #scale_x_discrete(name = "") +
+  facet_wrap(~Depth, scales = 'free_x', ncol = 3)+
+  stat_summary(mapping=aes(group=Site),                   
+  fun="mean",                                   
+  geom="point",shape=21,size=2,fill="white",    
+  position=position_dodge(0.75))+
+  ggtitle("ARGs carried by MGEs") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face =  "bold",family = "serif"),
+        panel.grid = element_blank(), 
+        strip.text = element_text(size = 12,family = "serif"),
+        text = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 13,face="bold",family = "serif"),
+        axis.text.x=element_blank(),
+        legend.position = "right",
+        legend.text = element_text(size = 12,family = "serif"),
+        panel.grid.minor=element_blank())
+p.glacier.data.MGE
+
+p1<-p.glacier.data.MGE +　stat_compare_means(method = "wilcox.test", method.args = list(var.equal = TRUE))
+p1
