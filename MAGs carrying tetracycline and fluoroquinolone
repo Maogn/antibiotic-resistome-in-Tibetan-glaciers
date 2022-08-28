@@ -1,0 +1,44 @@
+library("tidyr")
+library("ggplot2")
+library(car)
+library(ggpubr)
+
+library(purrr)
+mine.data.flu <- read.csv(file = "mine-data-flutet.csv")
+str(mine.data.flu)
+mine.long.flu <- pivot_longer(data = mine.data.flu,
+                          cols = -c(1:4),
+                          names_to = "Class",
+                          values_to = "Abundance")
+mine.long.flu <- within(mine.long.flu, Depth <- factor(Depth, levels = c("Snow", "Ice", "Cryoconite")))
+with(mine.long.flu, levels(Depth))
+p.flu<-ggplot(mine.long.flu,aes(x =  Class, y = Abundance, fill = Site)) +
+  geom_boxplot(alpha=0.9) +
+  scale_y_continuous(name = "Relative abundance",limits = c(0,700000))+
+  scale_x_discrete(name = "") +
+  facet_wrap(~Depth, scales = 'free_x', ncol = 3)+
+  stat_summary(mapping=aes(group=Site),                   
+  fun="mean",                                   
+  geom="point",shape=21,size=2,fill="white",    
+  position=position_dodge(0.75))+
+  ggtitle("MAGs carrying both Fluoroquinolone and Tetracycline genes") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 14, face =  "bold",family = "serif"),
+        panel.grid = element_blank(), 
+        strip.text = element_text(size = 12,family = "serif"),
+        text = element_text(size = 12),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 13,face="bold",family = "serif"),
+        axis.text.x=element_blank(),
+        legend.position = "right",
+        legend.text = element_text(size = 12,family = "serif"),
+        panel.grid.minor=element_blank())
+
+library(car)
+library(ggpubr)
+
+library(purrr)
+library(ggplot2)
+library(ggsignif)
+p1<-p.flu +　stat_compare_means(method = "wilcox.test", method.args = list(var.equal = TRUE))
+p1
