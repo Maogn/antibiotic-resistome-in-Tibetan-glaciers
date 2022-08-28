@@ -1,0 +1,46 @@
+ARG_top10 <- read.csv('ARG_top10_KG.csv', row.names = 1, stringsAsFactors = FALSE, check.names = FALSE)
+
+library(reshape2)
+library(ggplot2)
+
+ARG_top10$Taxonomy <- factor(rownames(ARG_top10), levels = rev(rownames(ARG_top10)))
+ARG_top10 <- melt(ARG_top10, id = 'Taxonomy')
+
+group <- read.delim('group.txt', sep = '\t', stringsAsFactors = FALSE)
+names(group)[1] <- 'variable'
+ARG_top10 <- merge(ARG_top10, group, by = 'variable')
+
+ARG_top10 <- within(ARG_top10, group <- factor(group, levels = c("Snow", "Ice", "Cryoconite")))
+with(ARG_top10, levels(group))
+ARG_top10$number<-order(ARG_top10[,1])
+
+ARG_top10_SD <- read.csv('ARG_top10_SD_KG.csv', row.names = 1, stringsAsFactors = FALSE, check.names = FALSE)
+ARG_top10_SD$Taxonomy <- factor(rownames(ARG_top10_SD), levels = rev(rownames(ARG_top10_SD)))
+ARG_top10_SD <- melt(ARG_top10_SD, id = 'Taxonomy')
+group <- read.delim('group.txt', sep = '\t', stringsAsFactors = FALSE)
+names(group)[1] <- 'variable'
+ARG_top10_SD <- merge(ARG_top10_SD, group, by = 'variable')
+
+ARG_top10_SD <- within(ARG_top10_SD, group <- factor(group, levels = c("Snow", "Ice", "Cryoconite")))
+names(ARG_top10_SD)[3] <- 'SD'
+ARG_top10_SD$number<-order(ARG_top10_SD[,1])
+ARG_top10 <- merge(ARG_top10, ARG_top10_SD, by ='number' )
+library(plyr)
+ARG_top10 <- ddply(ARG_top10,.(variable.x),transform,ybegin = cumsum(value)-SD,yend = cumsum(value)+SD)
+
+p <- ggplot(ARG_top10, aes(variable.x, value, fill = Taxonomy.x)) +
+  
+  geom_col(position = 'stack', width = 0.5) +
+  facet_wrap(~group.x, scales = 'free_x', ncol = 3) +
+  geom_errorbar(aes(ymin=yend,ymax=ybegin),
+                width=0.1,
+                color='black',
+                size=0.3)+
+  scale_fill_manual(values =  rev(c("#D5D5D3","#3B9AB2","#652926","#D14285", "#673770", "#AD6F3B","#CD9BCD", "#508578", 
+                                    "#DA5724","orange", "#5F7FC7","#CBD588"))) +
+  labs(x = '', y = 'Relative Abundance') +
+  ylim(0, 4000)+
+  theme(panel.grid = element_blank(), panel.background = element_rect(color = 'black', fill = 'transparent'), strip.text = element_text(size = 12)) +
+  theme(axis.text = element_text(size = 12,family = "serif"), axis.title = element_text(size = 13,family = "serif"), legend.title = element_blank(), 
+      legend.text = element_text(size = 11,family = "serif"))
+p
