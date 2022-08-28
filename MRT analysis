@@ -1,0 +1,7 @@
+library(mvpart)
+library(ggplot2)
+rm(list=ls())
+data85 <- read.csv("ARGdata21_Glacier.csv", row.names=1)
+head(data85)
+fit<-mvpart(data.matrix(data85)~latitude,data85,xv="1se",xadj =1.5,yadj = 1.5,
+            legend = F,which = 4,branch = 1,minauto=T,text.add = T, digits = 3)
